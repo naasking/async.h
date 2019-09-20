@@ -25,7 +25,7 @@ Function|Description
 *async_exit*|Terminate the current async subroutine
 *async_call(func, state)*|Asynchronously call `func(state)` and return true if done executing
 *async_init(state)*|Initialize async subroutine state
-*async_done(state)*|Check if async subroutine has completed execution
+*async_done(state)*|Returns true if async subroutine has completed execution, otherwise false
 
 # Examples
 
