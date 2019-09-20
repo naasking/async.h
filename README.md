@@ -15,15 +15,15 @@ this is a header-only async/await implementation for C based on Duff's device.
 
 # API
 
-|*async_begin(state)*|Mark the beginning of an async subroutine|
-|*async_end*|Mark the end of an async subroutine|
-|*async_yield*|Yield execution until it's invoked again|
-|*await(cond)*|Block progress until the `cond` is true|
-|*await_while(cond)*|Block progress while `cond` is true|
-|*async_exit*|Terminate the current async subroutine|
-|*async_call(func, state)*|Asynchronously call `func(state)` and return true if done executing|
-|*async_init(state)*|Initialize async subroutine state|
-|*async_done(state)*|Check if async subroutine has completed execution|
+*async_begin(state)*|Mark the beginning of an async subroutine
+*async_end*|Mark the end of an async subroutine
+*async_yield*|Yield execution until it's invoked again
+*await(cond)*|Block progress until the `cond` is true
+*await_while(cond)*|Block progress while `cond` is true
+*async_exit*|Terminate the current async subroutine
+*async_call(func, state)*|Asynchronously call `func(state)` and return true if done executing
+*async_init(state)*|Initialize async subroutine state
+*async_done(state)*|Check if async subroutine has completed execution
 
 # Examples
 
