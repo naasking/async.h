@@ -28,11 +28,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * This file is part of the protothreads library.
+ * This file is part of the async.h library.
  *
- * Author: Adam Dunkels <adam@sics.se>, Sandro Magi <naasking@gmail.com>
+ * Author: Sandro Magi <naasking@gmail.com>
  *
- * $Id: example-codelock.c,v 1.5 2005/10/06 07:57:08 adam Exp $
  */
 
 /*

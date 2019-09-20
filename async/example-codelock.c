@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
  * SUCH DAMAGE. 
  *
- * This file is part of the protothreads library.
+ * This file is part of the async.h library.
  *
  * Author: Adam Dunkels <adam@sics.se>, Sandro Magi <naasking@gmail.com>
  *
@@ -46,7 +46,7 @@
  * - how to implement a code lock key input mechanism, and
  * - how to implement a sequential timed routine.
  *
- * The program consists of two protothreads, one that implements the
+ * The program consists of two async functions, one that implements the
  * code lock reader and one that implements simulated keyboard input.
  *
  *
@@ -73,8 +73,8 @@ static int  timer_expired(struct timer *t);
 static void timer_set(struct timer *t, int usecs);
 /*---------------------------------------------------------------------------*/
 /*
- * This example uses two timers: one for the code lock protothread and
- * one for the simulated key input protothread.
+ * This example uses two timers: one for the code lock async and
+ * one for the simulated key input async.
  */
 static struct timer codelock_timer, input_timer;
 /*---------------------------------------------------------------------------*/
@@ -84,9 +84,9 @@ static struct timer codelock_timer, input_timer;
 static const char code[4] = {'1', '4', '2', '3'};
 /*---------------------------------------------------------------------------*/
 /*
- * This example has two protothread and therefor has two protothread
+ * This example has two async and therefore has two async
  * control structures of type struct async. These are initialized with
- * PT_INIT() in the main() function below.
+ * async_init() in the entry function below.
  */
 static struct async codelock_pt, input_pt;
 /*---------------------------------------------------------------------------*/
@@ -118,9 +118,9 @@ key_pressed(void)
 }
 /*---------------------------------------------------------------------------*/
 /*
- * Declaration of the protothread function implementing the code lock
- * logic. The protothread function is declared using the PT_THREAD()
- * macro. The function is declared with the "static" keyword since it
+ * Declaration of the async function implementing the code lock
+ * logic. The async function is declared using the `async` return type.
+ * The function is declared with the "static" keyword since it
  * is local to this file. The name of the function is codelock_thread
  * and it takes one argument, pt, of the type struct async.
  *
@@ -135,13 +135,13 @@ codelock_thread(struct async *pt)
   static int keys;
 
   /*
-   * Declare the beginning of the protothread.
+   * Declare the beginning of the async.
    */
   async_begin(pt);
 
   /*
-   * We'll let the protothread loop until the protothread is
-   * expliticly exited with PT_EXIT().
+   * We'll let the async loop until the async is
+   * expliticly exited with async_exit.
    */
   while(1) {
 
@@ -157,7 +157,7 @@ codelock_thread(struct async *pt)
       if(keys == 0) {
 
 	/*
-	 * The PT_WAIT_UNTIL() function will block until the condition
+	 * The await() function will block until the condition
 	 * key_pressed() is true.
 	 */
 	await(key_pressed());
@@ -174,8 +174,8 @@ codelock_thread(struct async *pt)
 
 	/*
 	 * The following statement shows how complex blocking
-	 * conditions can be easily expressed with protothreads and
-	 * the PT_WAIT_UNTIL() function.
+	 * conditions can be easily expressed with asyncs and
+	 * the await() function.
 	 */
 	await(key_pressed() || timer_expired(&codelock_timer));
 
@@ -228,7 +228,7 @@ codelock_thread(struct async *pt)
       await(key_pressed() || timer_expired(&codelock_timer));
 
       /*
-       * If we continued from the PT_WAIT_UNTIL() statement without
+       * If we continued from the await() statement without
        * the timer expired, we don't open the lock.
        */
       if(!timer_expired(&codelock_timer)) {
@@ -237,7 +237,7 @@ codelock_thread(struct async *pt)
 
 	/*
 	 * If the timer expired, we'll open the lock and exit from the
-	 * protothread.
+	 * async.
 	 */
 	printf("Code lock unlocked.\n");
 	async_exit;
@@ -246,16 +246,16 @@ codelock_thread(struct async *pt)
   }
 
   /*
-   * Finally, we'll mark the end of the protothread.
+   * Finally, we'll mark the end of the async.
    */
   async_end;
 }
 /*---------------------------------------------------------------------------*/
 /*
- * This is the second protothread in this example. It implements a
+ * This is the second async in this example. It implements a
  * simulated user pressing the keys. This illustrates how a linear
  * sequence of timed instructions can be implemented with
- * protothreads.
+ * asyncs.
  */
 static async
 input_thread(struct async *pt)
@@ -351,21 +351,21 @@ input_thread(struct async *pt)
 }
 /*---------------------------------------------------------------------------*/
 /*
- * This is the main function. It initializes the two protothread
- * control structures and schedules the two protothreads. The main
- * function returns when the protothread the runs the code lock exits.
+ * This is the main function. It initializes the two async
+ * control structures and schedules the two asyncs. The main
+ * function returns when the async the runs the code lock exits.
  */
 int
 example_codelock(void)
 {
   /*
-   * Initialize the two protothread control structures.
+   * Initialize the two async control structures.
    */
   async_init(&input_pt);
   async_init(&codelock_pt);
 
   /*
-   * Schedule the two protothreads until the codelock_thread() exits.
+   * Schedule the two asyncs until the codelock_thread() exits.
    */
   while(!async_call(codelock_thread, &codelock_pt)) {
     async_call(input_thread, &input_pt);
