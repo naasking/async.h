@@ -15,6 +15,8 @@ this is a header-only async/await implementation for C based on Duff's device.
 
 # API
 
+Function|Description
+--------|-----------
 *async_begin(state)*|Mark the beginning of an async subroutine
 *async_end*|Mark the end of an async subroutine
 *async_yield*|Yield execution until it's invoked again
