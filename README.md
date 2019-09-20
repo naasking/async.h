@@ -5,13 +5,11 @@ this is a header-only async/await implementation for C based on Duff's device.
 
 # Features
 
-1. It's a bit simpler to understand than protothreads because the async state
+1. It's 100% pure, portable C.
+2. It requires very little state (2 bytes).
+3. It's not dependent on an OS.
+4. It's a bit simpler to understand than protothreads because the async state
    is caller-saved rather than callee-saved.
-2. Subroutines can have persistent state that isn't just static state, because
-   each async subroutine accepts its own struct it uses as a parameter, and
-   the async state is stored there.
-3. Because of the more flexible state, async subroutines can be nested
-   in tree-like fashion which permits fork/join concurrency patterns.
 
 # API
 
@@ -120,11 +118,11 @@ async example(example_state *pt) {
 
 # Caveats
 
- 1. Due to compile-time bug, MSVC requires changing:
-     Project Properties > Configuration Properties > C/C++ > General > Debug Information Format
-    From "Program Database for Edit And Continue" to "Program Database".
- 2. As with protothreads, you can't use switch statements within an
-    async subroutine.
- 3. As with protothreads, you can't make blocking system calls and preserve
-    the async semantics. These must be changed into non-blocking calls that
-    test a condition.
+1. Due to compile-time bug, MSVC requires changing:
+    Project Properties > Configuration Properties > C/C++ > General > Debug Information Format
+   From "Program Database for Edit And Continue" to "Program Database".
+2. As with protothreads, you can't use switch statements within an
+   async subroutine.
+3. As with protothreads, you can't make blocking system calls and preserve
+   the async semantics. These must be changed into non-blocking calls that
+   test a condition.
