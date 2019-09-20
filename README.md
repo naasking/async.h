@@ -18,7 +18,7 @@ Function|Description
 *async_begin(state)*|Mark the beginning of an async subroutine
 *async_end*|Mark the end of an async subroutine
 *async_yield*|Yield execution until it's invoked again
-*await(cond)*|Block progress until the `cond` is true
+*await(cond)*|Block progress until `cond` is true
 *await_while(cond)*|Block progress while `cond` is true
 *async_exit*|Terminate the current async subroutine
 *async_call(func, state)*|Asynchronously call `func(state)` and return true if done executing
@@ -50,7 +50,7 @@ async example(struct async *pt) {
 ```
 Most of the code looks very similar, with the main exceptions being the
 more concise names, and the fact that the async.h calls mostly don't need
-to accept the async structure as an argument.
+to accept the async structure/local continuation as an argument.
 
 Here is the same example as above, but where the timer is lifted to
 a local parameter:
@@ -107,7 +107,7 @@ async example(example_state *pt) {
     async_init(&pt->nested2);
     await(async_call(nested, &pt->nested1) & async_call(nested, &pt->nested2));
     
-    // fork two nested async  subroutines and wait until at least one completes
+    // fork two nested async subroutines and wait until at least one completes
     async_init(&pt->nested1);
     async_init(&pt->nested2);
     await(async_call(nested, &pt->nested1) | async_call(nested, &pt->nested2));
@@ -119,7 +119,7 @@ async example(example_state *pt) {
 # Caveats
 
 1. Due to compile-time bug, MSVC requires changing:
-    Project Properties > Configuration Properties > C/C++ > General > Debug Information Format
+    `Project Properties > Configuration Properties > C/C++ > General > Debug Information Format`
    From "Program Database for Edit And Continue" to "Program Database".
 2. As with protothreads, you can't use switch statements within an
    async subroutine.
