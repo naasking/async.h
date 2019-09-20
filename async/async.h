@@ -65,7 +65,7 @@ typedef enum ASYNC_EVT { ASYNC_INIT = 0, ASYNC_DONE = -1 } async;
 /*
  * Declare the async state
  */
-#define async_state unsigned __kcont
+#define async_state unsigned _async_kcont
 
 /*
  * Core async structure, optional to use.
@@ -75,7 +75,7 @@ struct async { async_state; };
 /*
  * Mark the start of an async subroutine
  */
-#define async_begin(k) switch(k->__kcont) { case 0:
+#define async_begin(k) switch(k->_async_kcont) { case 0:
 
 /*
  * Mark the end of a generator thread
@@ -106,16 +106,16 @@ struct async { async_state; };
 /*
  * Initialize a new async computation
  */
-#define async_init(state) (state)->__kcont=ASYNC_INIT
+#define async_init(state) (state)->_async_kcont=ASYNC_INIT
 
 /*
  * Check if async subroutine is done
  */
-#define async_done(state) (state)->__kcont==ASYNC_DONE
+#define async_done(state) (state)->_async_kcont==ASYNC_DONE
 
 /*
  * Resume a running async computation and check for completion
  */
-#define async_call(f, state) (async_done(state) || ASYNC_DONE==((state)->__kcont = (f)(state)))
+#define async_call(f, state) (async_done(state) || ASYNC_DONE==((state)->_async_kcont = (f)(state)))
 
 #endif
