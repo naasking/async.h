@@ -1,5 +1,5 @@
-#ifndef __ASYNC_H__
-#define __ASYNC_H__
+#ifndef ASYNC_H
+#define ASYNC_H
 /*
  * Copyright (c) 2019, Sandro Magi
  * All rights reserved.

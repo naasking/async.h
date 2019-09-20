@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef __ASYNC_SEM_H__
-#define __ASYNC_SEM_H__
+#ifndef ASYNC_SEM_H
+#define ASYNC_SEM_H
 
 #include "async.h"
 
