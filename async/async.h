@@ -75,7 +75,7 @@ struct async { async_state; };
 /*
  * Mark the start of an async subroutine
  */
-#define async_begin(k) switch(k->_async_kcont) { case 0:
+#define async_begin(k) switch((k)->_async_kcont) { case 0:
 
 /*
  * Mark the end of a generator thread
