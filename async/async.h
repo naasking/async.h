@@ -58,7 +58,7 @@
  */
 
 /*
- * The generator event status
+ * The async computation status
  */
 typedef enum ASYNC_EVT { ASYNC_INIT = 0, ASYNC_DONE = -1 } async;
 
@@ -78,7 +78,7 @@ struct async { async_state; };
 #define async_begin(k) switch((k)->_async_kcont) { case 0:
 
 /*
- * Mark the end of a generator thread
+ * Mark the end of a async subroutine
  */
 #define async_end default: return ASYNC_DONE; }
 
@@ -90,7 +90,6 @@ struct async { async_state; };
 /*
  * Wait while the condition succeeds (optional)
  */
-//#define await_while(cond) while(cond) {async_yield;}
 #define await_while(cond) case __LINE__: if (cond) return __LINE__
 
 /*
