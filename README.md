@@ -29,7 +29,7 @@ Function|Description
 
 I ported the examples found in the protothreads distribution to async.h. Here
 is the async.h equivalent of the protothreads sample on the home page:
-```
+```C
 #include "async.h"
 
 struct async pt;
@@ -54,7 +54,7 @@ to accept the async structure/local continuation as an argument.
 
 Here is the same example as above, but where the timer is lifted to
 a local parameter:
-```
+```C
 #include "async.h"
 
 typedef struct { 
@@ -83,7 +83,7 @@ state structure.
 
 You can also execute nested async subroutines in a manner reminiscent of
 fork-join parallelism:
-```
+```C
 #include "async.h"
 
 typedef struct { 
