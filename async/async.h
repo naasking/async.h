@@ -57,10 +57,12 @@
  *    From "Program Database for Edit And Continue" to "Program Database".
  */
 
+#include <limits.h>
+
 /*
  * The async computation status
  */
-typedef enum ASYNC_EVT { ASYNC_INIT = 0, ASYNC_DONE = -1 } async;
+typedef enum ASYNC_EVT { ASYNC_INIT = 0, ASYNC_DONE = UINT_MAX } async;
 
 /*
  * Declare the async state
@@ -116,5 +118,16 @@ struct async { async_state; };
  * Resume a running async computation and check for completion
  */
 #define async_call(f, state) (async_done(state) || ASYNC_DONE==((state)->_async_kcont = (f)(state)))
+
+typedef struct {
+	async_state;
+	void *p;
+} async_env;
+async_env stack;
+
+#define async_begin0(x) stack.p = (x); switch(stack.async_kcont__) { case 0:
+#define await0(cond) case __LINE__: if (!(cond)) return __LINE__
+#define async_call0(f, env) async_done(env) || ASYNC_DONE==(stack.async_kcont__=f(args))
+#define async_end0 default:; }
 
 #endif
