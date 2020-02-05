@@ -42,19 +42,21 @@
  *
  * Features:
  *
- * 1. It's a bit simpler to follow than protothreads because the async state
- *    is caller-saved rather than callee-saved.
- * 2. Subroutines can have persistent state that isn't just static state, because
+ * 1. Subroutines can have persistent state that isn't just static state, because
  *    each async subroutine accepts its own struct it uses as a parameter, and
  *    the async state is stored there.
- * 3. Because of the more flexible state, async subroutines can be nested
+ * 2. Because of the more flexible state handling, async subroutines can be nested
  *    in tree-like fashion which permits fork/join concurrency patterns.
  *
  * Caveats:
  *
- * 1. Due to compile-time build error, MSVC requires changing:
- *     Project Properties > Configuration Properties > C/C++ > General > Debug Information Format
- *    From "Program Database for Edit And Continue" to "Program Database".
+ * 1. Due to compile-time bug, MSVC requires changing: 
+ *      Project Properties > Configuration Properties > C/C++ > General > Debug Information Format
+ *    from "Program Database for Edit And Continue" to "Program Database".
+ * 2. As with protothreads, you have to be very careful with switch statements within an async
+ *    subroutine. Generally best to avoid them.
+ * 3. As with protothreads, you can't make blocking system calls and preserve the async semantics.
+ *    These must be changed into non-blocking calls that test a condition.
  */
 
 #include <limits.h>
@@ -62,7 +64,7 @@
 /*
  * The async computation status
  */
-typedef enum ASYNC_EVT { ASYNC_INIT = 0, ASYNC_DONE = UINT_MAX } async;
+typedef enum ASYNC_EVT { ASYNC_INIT = 1, ASYNC_DONE = 0 } async;
 
 /*
  * Declare the async state
@@ -76,13 +78,15 @@ struct async { async_state; };
 
 /*
  * Mark the start of an async subroutine
+ *
+ * Unknown continuation values now restart the subroutine from the beginning.
  */
-#define async_begin(k) unsigned *_k = &(k)->_async_k; switch(*_k) { default:
+#define async_begin(k) unsigned *_async_k = &(k)->_async_k; switch(*_async_k) { default:
 
 /*
  * Mark the end of a async subroutine
  */
-#define async_end *_k=ASYNC_DONE; case ASYNC_DONE: return 1; }
+#define async_end *_async_k=ASYNC_DONE; case ASYNC_DONE: return 1; }
 
 /*
  * Wait until the condition succeeds
@@ -91,18 +95,21 @@ struct async { async_state; };
 
 /*
  * Wait while the condition succeeds (optional)
+ *
+ * Continuation state is now callee-saved like protothreads, which avoids
+ * duplicate writes from the caller-saved design.
  */
-#define await_while(cond) *_k = __LINE__; case __LINE__: if (cond) return 0
+#define await_while(cond) *_async_k = __LINE__; case __LINE__: if (cond) return 0
 
 /*
  * Yield execution
  */
-#define async_yield *_k = __LINE__; return 0; case __LINE__:
+#define async_yield *_async_k = __LINE__; return 0; case __LINE__:
 
 /*
  * Exit the current async subroutine
  */
-#define async_exit *_k = ASYNC_DONE; return 1
+#define async_exit *_async_k = ASYNC_DONE; return 1
 
 /*
  * Initialize a new async computation
@@ -117,8 +124,8 @@ struct async { async_state; };
 /*
  * Resume a running async computation and check for completion (optional)
  *
- * You can simply call the function itself which will return true
- * if the async call is complete, or false if it's still in progress.
+ * Calling the function itself will return true if the async call is complete,
+ * or false if it's still in progress, so this macro is merely a minor optimization.
  */
 #define async_call(f, state) (async_done(state) || (f)(state))
 
