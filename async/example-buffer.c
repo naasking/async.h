@@ -146,7 +146,7 @@ example_buffer(void)
 
 	async_init(&driver_pt);
 
-	while (!async_call(driver_thread, &driver_pt)) {
+	while (!driver_thread(&driver_pt)) {
 
 		/*
 		 * When running this example on a multitasking system, we must

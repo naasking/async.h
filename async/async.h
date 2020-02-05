@@ -67,7 +67,7 @@ typedef enum ASYNC_EVT { ASYNC_INIT = 0, ASYNC_DONE = UINT_MAX } async;
 /*
  * Declare the async state
  */
-#define async_state unsigned _async_kcont
+#define async_state unsigned _async_k
 
 /*
  * Core async structure, optional to use.
@@ -77,12 +77,12 @@ struct async { async_state; };
 /*
  * Mark the start of an async subroutine
  */
-#define async_begin(k) switch((k)->_async_kcont) { case 0:
+#define async_begin(k) unsigned *_k = &(k)->_async_k; switch(*_k) { default:
 
 /*
  * Mark the end of a async subroutine
  */
-#define async_end default: return ASYNC_DONE; }
+#define async_end *_k=ASYNC_DONE; case ASYNC_DONE: return 1; }
 
 /*
  * Wait until the condition succeeds
@@ -92,42 +92,34 @@ struct async { async_state; };
 /*
  * Wait while the condition succeeds (optional)
  */
-#define await_while(cond) case __LINE__: if (cond) return __LINE__
+#define await_while(cond) *_k = __LINE__; case __LINE__: if (cond) return 0
 
 /*
  * Yield execution
  */
-#define async_yield return __LINE__; case __LINE__:
+#define async_yield *_k = __LINE__; return 0; case __LINE__:
 
 /*
  * Exit the current async subroutine
  */
-#define async_exit return ASYNC_DONE
+#define async_exit *_k = ASYNC_DONE; return 1
 
 /*
  * Initialize a new async computation
  */
-#define async_init(state) (state)->_async_kcont=ASYNC_INIT
+#define async_init(state) (state)->_async_k=ASYNC_INIT
 
 /*
  * Check if async subroutine is done
  */
-#define async_done(state) (state)->_async_kcont==ASYNC_DONE
+#define async_done(state) (state)->_async_k==ASYNC_DONE
 
 /*
- * Resume a running async computation and check for completion
+ * Resume a running async computation and check for completion (optional)
+ *
+ * You can simply call the function itself which will return true
+ * if the async call is complete, or false if it's still in progress.
  */
-#define async_call(f, state) (async_done(state) || ASYNC_DONE==((state)->_async_kcont = (f)(state)))
-
-typedef struct {
-	async_state;
-	void *p;
-} async_env;
-async_env stack;
-
-#define async_begin0(x) stack.p = (x); switch(stack.async_kcont__) { case 0:
-#define await0(cond) case __LINE__: if (!(cond)) return __LINE__
-#define async_call0(f, env) async_done(env) || ASYNC_DONE==(stack.async_kcont__=f(args))
-#define async_end0 default:; }
+#define async_call(f, state) (async_done(state) || (f)(state))
 
 #endif

@@ -367,8 +367,8 @@ example_codelock(void)
   /*
    * Schedule the two asyncs until the codelock_thread() exits.
    */
-  while(!async_call(codelock_thread, &codelock_pt)) {
-    async_call(input_thread, &input_pt);
+  while(!codelock_thread(&codelock_pt)) {
+    input_thread(&input_pt);
     
     /*
      * When running this example on a multitasking system, we must
