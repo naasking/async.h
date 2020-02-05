@@ -21,7 +21,7 @@ Function|Description
 *await(cond)*|Block progress until `cond` is true
 *await_while(cond)*|Block progress while `cond` is true
 *async_exit*|Terminate the current async subroutine
-*async_call(func, state)*|Asynchronously call `func(state)` and return true if done executing
+*async_call(func, state)*|Asynchronously call `func(state)` and return true if done executing (optional). You can also simply call `func(state)`directly which returns true/false.
 *async_init(state)*|Initialize async subroutine state
 *async_done(state)*|Returns true if async subroutine has completed execution, otherwise false
 
@@ -106,11 +106,15 @@ async example(example_state *pt) {
     async_init(&pt->nested1);
     async_init(&pt->nested2);
     await(async_call(nested, &pt->nested1) & async_call(nested, &pt->nested2));
+    // OR call directly:
+    //await(nested(&pt->nested1) & nested(&pt->nested2));
     
     // fork two nested async subroutines and wait until at least one completes
     async_init(&pt->nested1);
     async_init(&pt->nested2);
     await(async_call(nested, &pt->nested1) | async_call(nested, &pt->nested2));
+    // OR call the subroutines directly:
+    //await(nested(&pt->nested1) | nested(&pt->nested2));
 
     async_end;
 }

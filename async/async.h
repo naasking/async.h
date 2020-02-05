@@ -64,7 +64,7 @@
 /*
  * The async computation status
  */
-typedef enum ASYNC_EVT { ASYNC_INIT = 1, ASYNC_DONE = 0 } async;
+typedef enum ASYNC_EVT { ASYNC_INIT = 0, ASYNC_CONT = ASYNC_INIT, ASYNC_DONE = 1 } async;
 
 /*
  * Declare the async state
@@ -86,7 +86,7 @@ struct async { async_state; };
 /*
  * Mark the end of a async subroutine
  */
-#define async_end *_async_k=ASYNC_DONE; case ASYNC_DONE: return 1; }
+#define async_end *_async_k=ASYNC_DONE; case ASYNC_DONE: return ASYNC_DONE; }
 
 /*
  * Wait until the condition succeeds
@@ -96,20 +96,20 @@ struct async { async_state; };
 /*
  * Wait while the condition succeeds (optional)
  *
- * Continuation state is now callee-saved like protothreads, which avoids
+ * Continuation state is now callee-saved like protothreads which avoids
  * duplicate writes from the caller-saved design.
  */
-#define await_while(cond) *_async_k = __LINE__; case __LINE__: if (cond) return 0
+#define await_while(cond) *_async_k = __LINE__; case __LINE__: if (cond) return ASYNC_CONT
 
 /*
  * Yield execution
  */
-#define async_yield *_async_k = __LINE__; return 0; case __LINE__:
+#define async_yield *_async_k = __LINE__; return ASYNC_CONT; case __LINE__:
 
 /*
  * Exit the current async subroutine
  */
-#define async_exit *_async_k = ASYNC_DONE; return 1
+#define async_exit *_async_k = ASYNC_DONE; return ASYNC_DONE
 
 /*
  * Initialize a new async computation
