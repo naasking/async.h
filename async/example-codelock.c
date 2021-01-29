@@ -141,7 +141,7 @@ codelock_thread(struct async *pt)
 
   /*
    * We'll let the async loop until the async is
-   * expliticly exited with async_exit.
+   * explicitly exited with async_exit.
    */
   while(1) {
 
