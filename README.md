@@ -125,8 +125,10 @@ async example(example_state *pt) {
 1. Due to compile-time bug, MSVC requires changing:
     `Project Properties > Configuration Properties > C/C++ > General > Debug Information Format`
    From "Program Database for Edit And Continue" to "Program Database".
-2. As with protothreads, you have to be very careful with switch
-   statements within an async subroutine. Generally best to avoid them.
+2. As with protothreads, you have to be careful with switch statements
+   within an async subroutine. Stick to this simple rule and you'll
+   never have trouble: place every switch in its own function. This is
+   generally a good practice anyway.
 3. As with protothreads, you can't make blocking system calls and preserve
    the async semantics. These must be changed into non-blocking calls that
    test a condition.
