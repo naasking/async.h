@@ -62,7 +62,13 @@
  *    These must be changed into non-blocking calls that test a condition.
  */
 
+/**
+ * Modified to include async_sleep function which can be used with await.
+ */
+
 #include <limits.h>
+#include <time.h>
+#include <stdbool.h>
 
 /**
  * The async computation status
@@ -72,7 +78,7 @@ typedef enum ASYNC_EVT { ASYNC_INIT = 0, ASYNC_CONT = ASYNC_INIT, ASYNC_DONE = 1
 /**
  * Declare the async state
  */
-#define async_state unsigned _async_k
+#define async_state unsigned _async_k; clock_t _time
 
 /**
  * Core async structure, optional to use.
@@ -84,7 +90,7 @@ struct async { async_state; };
  *
  * @param k The async state
  */
-#define async_begin(k) unsigned *_async_k = &(k)->_async_k; switch(*_async_k) { default:
+#define async_begin(k) clock_t *_time = &(k)->_time; unsigned *_async_k = &(k)->_async_k; switch(*_async_k) { default:
 
 /**
  * Mark the end of a async subroutine
@@ -117,7 +123,7 @@ struct async { async_state; };
  * Initialize a new async computation
  * @param state The async procedure state to initialize
  */
-#define async_init(state) (state)->_async_k=ASYNC_INIT
+#define async_init(state) (state)->_async_k=ASYNC_INIT; (state)->_time=(clock_t)0
 
 /**
  * Check if async subroutine is done
@@ -134,5 +140,30 @@ struct async { async_state; };
  * @param state The async procedure state
  */
 #define async_call(f, state) (async_done(state) || (f)(state))
+
+/**
+ * Condition to be used with await which returns true after a specified amount of time has elapsed.
+ * @param duration The amount of time to wait before this condition returns true.
+ */
+#define async_sleep(duration) _check_timer(_time, (duration))
+
+/**
+ * "Private" method to check if a timer is completed.
+ * NOTE: I only need this because cond for await must be an expression and I don't know how to make a lambda in C.
+ */
+bool _check_timer(clock_t *time, double duration) {
+    if (!*time) {
+        *time = clock();
+        return false;
+    }
+    else {
+        double elapsed = (double)(clock() - *time) / CLOCKS_PER_SEC;
+        if (elapsed >= duration) {
+            *time = 0;
+            return true;
+        }
+        else return false;
+    }
+}
 
 #endif
