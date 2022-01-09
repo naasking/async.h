@@ -367,21 +367,10 @@ example_codelock(void)
   /*
    * Schedule the two asyncs until the codelock_thread() exits.
    */
-  while(!codelock_thread(&codelock_pt)) {
-    input_thread(&input_pt);
-    
-    /*
-     * When running this example on a multitasking system, we must
-     * give other processes a chance to run too and therefore we call
-     * usleep() resp. Sleep() here. On a dedicated embedded system,
-     * we usually do not need to do this.
-     */
-#ifdef _WIN32
-    Sleep(0);
-#else
-    usleep(10);
-#endif
-  }
+  async_run(
+    codelock_thread(&codelock_pt) &
+    input_thread(&input_pt)
+  );
 
   return 0;
 }

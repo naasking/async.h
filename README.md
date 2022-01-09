@@ -24,6 +24,7 @@ Function|Description
 *async_call(func, state)*|Asynchronously call `func(state)` and return true if done executing (optional). You can also simply call `func(state)`directly which returns true/false.
 *async_init(state)*|Initialize async subroutine state
 *async_done(state)*|Returns true if async subroutine has completed execution, otherwise false
+*async_run(cond)*|Runs your async function(s) from a non async function separated by `&` or `\|` to specify when all or one complete respectively
 
 # Examples
 
