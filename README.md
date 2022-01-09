@@ -30,8 +30,9 @@ Function|Description
 
 I ported the examples found in the protothreads distribution to async.h. Here
 is the async.h equivalent of the protothreads sample on the home page:
-```C
+```c
 #include "async.h"
+#include "async-time.h"
 
 struct async pt;
 struct timer timer;
@@ -41,7 +42,7 @@ async example(struct async *pt) {
     
     while(1) {
         if(initiate_io()) {
-            timer_start(&timer);
+            timer_set(&timer);
             await(io_completed() || timer_expired(&timer));
             read_data();
         }
@@ -55,12 +56,13 @@ to accept the async structure/local continuation as an argument.
 
 Here is the same example as above, but where the timer is lifted to
 a local parameter:
-```C
+```c
 #include "async.h"
+#include "async-time.h"
 
 typedef struct { 
     async_state;    // declare the asynchronous state
-    timer timer;    // declare local state
+    struct timer timer;    // declare local state
 } example_state;
 example_state pt;
 
@@ -69,7 +71,7 @@ async example(example_state *pt) {
     
     while(1) {
         if(initiate_io()) {
-            timer_start(&pt->timer);
+            timer_set(&pt->timer);
             await(io_completed() || timer_expired(&pt->timer));
             read_data();
         }
