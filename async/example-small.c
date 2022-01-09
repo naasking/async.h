@@ -1,7 +1,8 @@
 /**
  * This is a very small example that shows how to use
  * async.h. The program consists of two async subroutines that wait
- * for each other to toggle a variable.
+ * for each other to toggle a variable. This continues while a third async
+ * subroutine counts down from a provided starting integer.
  */
 
 /* We must always include async.h in our asyncs code. */
@@ -10,7 +11,7 @@
 #include <stdio.h> /* For printf(). */
 
 /* Two flags that the two async functions use. */
-static int async1_flag, async2_flag;
+static int async1_flag, async2_flag, counter;
 
 /**
  * The first async function. A async function must always
@@ -72,26 +73,46 @@ async2(struct async *pt)
 }
 
 /**
+ * An async function to decrement the global countdown
+ */
+static async
+countdown(struct async *pt)
+{
+	async_begin(pt);
+
+	/* Yield control to other functions while the counter is above 0 */
+	while (counter-- >= 0) {
+		async_yield;
+	}
+
+	async_end;
+}
+
+/**
  * Finally, we have the main loop. Here is where the asyncs are
  * initialized and scheduled. First, however, we define the
- * async state variables pt1 and pt2, which hold the state of
- * the two asyncs.
+ * async state variables pt1, pt2, and count, which hold the state of
+ * the 3 asyncs.
  */
-static struct async pt1, pt2;
+static struct async pt1, pt2, count;
 void
 example_small(int i)
 {
 	/* Initialize the async state variables with async_init(). */
 	async_init(&pt1);
 	async_init(&pt2);
+	async_init(&count);
+
+	counter = i;
 
 	/*
-	 * Then we schedule the two asyncs by repeatedly calling their
-	 * async functions and passing a pointer to the async
+	 * Then we schedule the three asyncs by repeatedly calling their async
+	 * functions via the `async_run` macro and passing a pointer to the async
 	 * state variables as arguments.
 	 */
-	while (--i >= 0) {
-		async1(&pt1);
-		async2(&pt2);
-	}
+	async_run(
+		countdown(&count) |
+		async1(&pt1) |
+		async2(&pt2)
+	);
 }
