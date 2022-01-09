@@ -4,5 +4,6 @@
 extern void example_small(int);
 extern int example_buffer(void);
 extern int example_codelock(void);
+extern int example_print_after(void);
 
 #endif

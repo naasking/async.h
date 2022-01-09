@@ -2,7 +2,7 @@ CC = gcc
 CCFlags = -Wall
 BUILD_DIR = build
 
-SRC = async-time.c example-buffer.c example-codelock.c example-small.c main.c
+SRC = async-time.c example-buffer.c example-codelock.c example-print-after.c example-small.c main.c
 OBJ = $(patsubst %.c,$(BUILD_DIR)/%.o,$(SRC))
 
 all : $(OBJ)
