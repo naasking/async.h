@@ -92,6 +92,14 @@ struct async { async_state; };
 #define async_end *_async_k=ASYNC_DONE; case ASYNC_DONE: return ASYNC_DONE; }
 
 /**
+ * Wrap code with async_begin/async_end.
+ * 
+ * @param state The async procedure state
+ * @param ... The code block to wrap
+ */
+#define ASYNC(state, ...) async_begin(state); __VA_ARGS__ async_end
+
+/**
  * Wait until the condition succeeds
  * @param cond The condition that must be satisfied before execution can proceed
  */
