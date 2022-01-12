@@ -70,6 +70,11 @@
 typedef enum ASYNC_EVT { ASYNC_INIT = 0, ASYNC_CONT = ASYNC_INIT, ASYNC_DONE = 1 } async;
 
 /**
+ * Gets a unique number starting at 2 to avoid conflict with ASYNC_EVT
+ */
+#define _UNIQUE_NUM __COUNTER__ + 2
+
+/**
  * Declare the async state
  */
 #define async_state unsigned _async_k
@@ -101,12 +106,12 @@ struct async { async_state; };
  * Wait while the condition succeeds
  * @param cond The condition that must fail before execution can proceed
  */
-#define await_while(cond) *_async_k = __LINE__; case __LINE__: if (cond) return ASYNC_CONT
+#define await_while(cond) *_async_k = _UNIQUE_NUM + 1; case _UNIQUE_NUM: if (cond) return ASYNC_CONT
 
 /**
  * Yield execution
  */
-#define async_yield *_async_k = __LINE__; return ASYNC_CONT; case __LINE__:
+#define async_yield *_async_k = _UNIQUE_NUM + 1; return ASYNC_CONT; case _UNIQUE_NUM:
 
 /**
  * Exit the current async subroutine
