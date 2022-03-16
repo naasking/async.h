@@ -87,6 +87,11 @@ struct async { async_state; };
 #define async_begin(k) unsigned *_async_k = &(k)->_async_k; switch(*_async_k) { default:
 
 /**
+ * Mark the start of an async subroutine where the state is abstracted
+ */
+#define async_begin_static static struct async _async_state = { ASYNC_INIT }; async_begin(&_async_state)
+
+/**
  * Mark the end of a async subroutine
  */
 #define async_end *_async_k=ASYNC_DONE; case ASYNC_DONE: return ASYNC_DONE; }

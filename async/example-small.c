@@ -21,11 +21,12 @@ static int async1_flag, async2_flag;
  * the code.
  */
 static async
-async1(struct async *pt)
+async1()
 {
 	/* A async function must begin with async_begin() which takes a
-	   pointer to a struct async. */
-	async_begin(pt);
+	   pointer to a struct async. The async_begin_static macro does
+	   this in the preprocessor*/
+	async_begin_static;
 
 	/* We loop forever here. */
 	while (1) {
@@ -51,9 +52,9 @@ async1(struct async *pt)
  * first one.
  */
 static async
-async2(struct async *pt)
+async2()
 {
-	async_begin(pt);
+	async_begin_static;
 
 	while (1) {
 		/* Let the other async run. */
@@ -75,23 +76,18 @@ async2(struct async *pt)
  * Finally, we have the main loop. Here is where the asyncs are
  * initialized and scheduled. First, however, we define the
  * async state variables pt1 and pt2, which hold the state of
- * the two asyncs.
+ * the two asyncs. This example utilizes async_begin_static
  */
-static struct async pt1, pt2;
 void
 example_small(int i)
 {
-	/* Initialize the async state variables with async_init(). */
-	async_init(&pt1);
-	async_init(&pt2);
-
 	/*
 	 * Then we schedule the two asyncs by repeatedly calling their
 	 * async functions and passing a pointer to the async
 	 * state variables as arguments.
 	 */
 	while (--i >= 0) {
-		async1(&pt1);
-		async2(&pt2);
+		async1();
+		async2();
 	}
 }
