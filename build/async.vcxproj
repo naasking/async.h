@@ -87,6 +87,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -118,17 +119,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="async-sem.h" />
-    <ClInclude Include="async.h" />
-    <ClCompile Include="example-buffer.c">
+    <ClInclude Include="..\async\async-sem.h" />
+    <ClInclude Include="..\async\async.h" />
+    <ClCompile Include="..\async\example-buffer.c">
       <FileType>CppCode</FileType>
     </ClCompile>
-    <ClInclude Include="examples.h" />
+    <ClInclude Include="..\async\examples.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="example-codelock.c" />
-    <ClCompile Include="example-small.c" />
-    <ClCompile Include="main.c" />
+    <ClCompile Include="..\async\example-codelock.c" />
+    <ClCompile Include="..\async\example-small.c" />
+    <ClCompile Include="..\async\main.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
