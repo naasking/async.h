@@ -17,6 +17,7 @@ Function|Description
 --------|-----------
 *async_begin(state)*|Mark the beginning of an async subroutine
 *async_end*|Mark the end of an async subroutine
+*ASYNC(state, ...code block...)*|Wrap the code block with async_begin and async_end automatically
 *async_yield*|Yield execution until it's invoked again
 *await(cond)*|Block progress until `cond` is true
 *await_while(cond)*|Block progress while `cond` is true
@@ -94,29 +95,29 @@ typedef struct {
 example_state pt;
 
 async nested(struct async *pt){
-    async_begin(pt);
+    ASYNC(pt, {
     ...
-    async_end;
+    });
 }
 
 async example(example_state *pt) {
-    async_begin(pt);
+    ASYNC(pt, {
 
-    // fork two nested async subroutines and wait until both complete
-    async_init(&pt->nested1);
-    async_init(&pt->nested2);
-    await(async_call(nested, &pt->nested1) & async_call(nested, &pt->nested2));
-    // OR call directly:
-    //await(nested(&pt->nested1) & nested(&pt->nested2));
-    
-    // fork two nested async subroutines and wait until at least one completes
-    async_init(&pt->nested1);
-    async_init(&pt->nested2);
-    await(async_call(nested, &pt->nested1) | async_call(nested, &pt->nested2));
-    // OR call the subroutines directly:
-    //await(nested(&pt->nested1) | nested(&pt->nested2));
+        // fork two nested async subroutines and wait until both complete
+        async_init(&pt->nested1);
+        async_init(&pt->nested2);
+        await(async_call(nested, &pt->nested1) & async_call(nested, &pt->nested2));
+        // OR call directly:
+        //await(nested(&pt->nested1) & nested(&pt->nested2));
+        
+        // fork two nested async subroutines and wait until at least one completes
+        async_init(&pt->nested1);
+        async_init(&pt->nested2);
+        await(async_call(nested, &pt->nested1) | async_call(nested, &pt->nested2));
+        // OR call the subroutines directly:
+        //await(nested(&pt->nested1) | nested(&pt->nested2));
 
-    async_end;
+    });
 }
 ```
 
