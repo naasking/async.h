@@ -34,6 +34,7 @@
  * Pulled from: https://github.com/naasking/async.h
  * 
  * Author: Sandro Magi <naasking@gmail.com>
+ * Contributor: Paul Sorensen <paulsorensen5@gmail.com>
  */
 
 /**
@@ -134,5 +135,11 @@ struct async { async_state; };
  * @param state The async procedure state
  */
 #define async_call(f, state) (async_done(state) || (f)(state))
+
+/**
+ * Wait until the condition succeeds from a non-async function
+ * @param cond The condition that must be satisfied before execution can proceed
+ */
+#define async_run(cond) while(!(cond))
 
 #endif
