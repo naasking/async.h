@@ -1,6 +1,6 @@
 /**
  * \file
- * Couting semaphores implemented on async, copied from protothreads.
+ * Counting semaphores implemented on async, copied from protothreads.
  * \author
  * Sandro Magi <naasking@gmail.com>
  *
