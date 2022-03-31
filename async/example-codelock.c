@@ -61,16 +61,8 @@
 #include <stdio.h>
 
 #include "async.h"
+#include "async-time.h"
 
-/*---------------------------------------------------------------------------*/
-/*
- * The following definitions are just for the simple timer library
- * used in this example. The actual implementation of the functions
- * can be found at the end of this file.
- */
-struct timer { int start, interval; };
-static int  timer_expired(struct timer *t);
-static void timer_set(struct timer *t, int usecs);
 /*---------------------------------------------------------------------------*/
 /*
  * This example uses two timers: one for the code lock async and
@@ -385,30 +377,4 @@ example_codelock(void)
 
   return 0;
 }
-/*---------------------------------------------------------------------------*/
-/*
- * Finally, the implementation of the simple timer library follows.
- */
-#ifdef _WIN32
 
-static int clock_time(void)
-{ return (int)GetTickCount(); }
-
-#else /* _WIN32 */
-
-static int clock_time(void)
-{
-  struct timeval tv;
-  struct timezone tz;   
-  gettimeofday(&tv, &tz); 
-  return tv.tv_sec * 1000 + tv.tv_usec / 1000;
-}
-
-#endif /* _WIN32 */
-
-static int timer_expired(struct timer *t)
-{ return (int)(clock_time() - t->start) >= (int)t->interval; }
-
-static void timer_set(struct timer *t, int interval)
-{ t->interval = interval; t->start = clock_time(); }
-/*---------------------------------------------------------------------------*/
