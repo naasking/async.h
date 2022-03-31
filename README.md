@@ -24,13 +24,69 @@ Function|Description
 *async_call(func, state)*|Asynchronously call `func(state)` and return true if done executing (optional). You can also simply call `func(state)`directly which returns true/false.
 *async_init(state)*|Initialize async subroutine state
 *async_done(state)*|Returns true if async subroutine has completed execution, otherwise false
+*async_run(cond)*|Runs your async function(s) from a non async function separated by `&` or `\|` to specify when all or one complete respectively
 
 # Examples
 
+The following is a sample program where multiple coroutines print they are starting, sleep for a specified time, and
+print they slept the specified time
+```c
+#include "async.h"
+#include "async-time.h"
+
+struct print_after_state
+{
+    async_state;
+    struct async_sleep_state async_sleep_state;
+};
+
+static async print_after(struct print_after_state *state, unsigned int duration)
+{
+    async_begin(state);
+
+    printf("Starting %d second counter...\n", duration);
+    async_yield;
+    printf("Yield from %d second counter demo'd!\n", duration);
+    async_init(&state->async_sleep_state);
+    await(async_sleep(&state->async_sleep_state, duration * 1000));
+    printf("Slept: %d seconds\n", duration);
+
+    async_end;
+}
+
+int example_print_after(void)
+{
+    struct print_after_state a = {}, b = {}, c = {};
+
+    async_run(
+        print_after(&a, 3) &
+        print_after(&b, 5) &
+        print_after(&c, 1)
+    );
+    
+    return 0;
+}
+```
+
+Prints the following and runs a total of 5 seconds:
+
+```
+Starting 3 second counter...
+Starting 5 second counter...
+Starting 1 second counter...
+Yield from 3 second counter demo'd!
+Yield from 5 second counter demo'd!
+Yield from 1 second counter demo'd!
+Slept: 1 seconds
+Slept: 3 seconds
+Slept: 5 seconds
+```
+
 I ported the examples found in the protothreads distribution to async.h. Here
 is the async.h equivalent of the protothreads sample on the home page:
-```C
+```c
 #include "async.h"
+#include "async-time.h"
 
 struct async pt;
 struct timer timer;
@@ -40,7 +96,7 @@ async example(struct async *pt) {
     
     while(1) {
         if(initiate_io()) {
-            timer_start(&timer);
+            timer_set(&timer);
             await(io_completed() || timer_expired(&timer));
             read_data();
         }
@@ -54,12 +110,13 @@ to accept the async structure/local continuation as an argument.
 
 Here is the same example as above, but where the timer is lifted to
 a local parameter:
-```C
+```c
 #include "async.h"
+#include "async-time.h"
 
 typedef struct { 
     async_state;    // declare the asynchronous state
-    timer timer;    // declare local state
+    struct timer timer;    // declare local state
 } example_state;
 example_state pt;
 
@@ -68,7 +125,7 @@ async example(example_state *pt) {
     
     while(1) {
         if(initiate_io()) {
-            timer_start(&pt->timer);
+            timer_set(&pt->timer);
             await(io_completed() || timer_expired(&pt->timer));
             read_data();
         }
